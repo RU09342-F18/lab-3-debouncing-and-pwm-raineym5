@@ -1,0 +1,220 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	__vector_16
+  12               	__vector_16:
+  13               	.LFB0:
+  14               		.file 1 "main.c"
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <stdint.h>
+   3:main.c        **** #include <avr/interrupt.h>
+   4:main.c        **** 
+   5:main.c        **** #define F_CPU 8000000UL 
+   6:main.c        **** 
+   7:main.c        **** volatile uint8_t incrementer=0,totalcounter=0;
+   8:main.c        **** 
+   9:main.c        **** ISR(TIMER0_OVF_vect){
+  15               		.loc 1 9 0
+  16               		.cfi_startproc
+  17 0000 1F92      		push r1
+  18               	.LCFI0:
+  19               		.cfi_def_cfa_offset 3
+  20               		.cfi_offset 1, -2
+  21 0002 0F92      		push r0
+  22               	.LCFI1:
+  23               		.cfi_def_cfa_offset 4
+  24               		.cfi_offset 0, -3
+  25 0004 0FB6      		in r0,__SREG__
+  26 0006 0F92      		push r0
+  27 0008 1124      		clr __zero_reg__
+  28 000a 8F93      		push r24
+  29               	.LCFI2:
+  30               		.cfi_def_cfa_offset 5
+  31               		.cfi_offset 24, -4
+  32               	/* prologue: Signal */
+  33               	/* frame size = 0 */
+  34               	/* stack size = 4 */
+  35               	.L__stack_usage = 4
+  10:main.c        **** 	totalcounter++;
+  36               		.loc 1 10 0
+  37 000c 8091 0000 		lds r24,totalcounter
+  38 0010 8F5F      		subi r24,lo8(-(1))
+  39 0012 8093 0000 		sts totalcounter,r24
+  11:main.c        **** 	if(PORTB && ~PORTB0)
+  40               		.loc 1 11 0
+  41 0016 85B1      		in r24,0x5
+  42 0018 8823      		tst r24
+  43 001a 01F0      		breq .L2
+  12:main.c        **** 		incrementer++;
+  44               		.loc 1 12 0
+  45 001c 8091 0000 		lds r24,incrementer
+  46 0020 8F5F      		subi r24,lo8(-(1))
+  47 0022 8093 0000 		sts incrementer,r24
+  48               	.L2:
+  13:main.c        **** 	if(totalcounter==30){
+  49               		.loc 1 13 0
+  50 0026 8091 0000 		lds r24,totalcounter
+  51 002a 8E31      		cpi r24,lo8(30)
+  52 002c 01F4      		brne .L1
+  14:main.c        **** 		    TCCR0B = 0;//kill timer
+  53               		.loc 1 14 0
+  54 002e 15BC      		out 0x25,__zero_reg__
+  55               	.L1:
+  56               	/* epilogue start */
+  15:main.c        **** 	}
+  16:main.c        **** 	
+  17:main.c        **** }
+  57               		.loc 1 17 0
+  58 0030 8F91      		pop r24
+  59 0032 0F90      		pop r0
+  60 0034 0FBE      		out __SREG__,r0
+  61 0036 0F90      		pop r0
+  62 0038 1F90      		pop r1
+  63 003a 1895      		reti
+  64               		.cfi_endproc
+  65               	.LFE0:
+  67               	.global	__vector_3
+  69               	__vector_3:
+  70               	.LFB1:
+  18:main.c        **** ISR(PCINT0_vect){
+  71               		.loc 1 18 0
+  72               		.cfi_startproc
+  73 003c 1F92      		push r1
+  74               	.LCFI3:
+  75               		.cfi_def_cfa_offset 3
+  76               		.cfi_offset 1, -2
+  77 003e 0F92      		push r0
+  78               	.LCFI4:
+  79               		.cfi_def_cfa_offset 4
+  80               		.cfi_offset 0, -3
+  81 0040 0FB6      		in r0,__SREG__
+  82 0042 0F92      		push r0
+  83 0044 1124      		clr __zero_reg__
+  84 0046 8F93      		push r24
+  85               	.LCFI5:
+  86               		.cfi_def_cfa_offset 5
+  87               		.cfi_offset 24, -4
+  88 0048 9F93      		push r25
+  89               	.LCFI6:
+  90               		.cfi_def_cfa_offset 6
+  91               		.cfi_offset 25, -5
+  92               	/* prologue: Signal */
+  93               	/* frame size = 0 */
+  94               	/* stack size = 5 */
+  95               	.L__stack_usage = 5
+  19:main.c        **** 	if(PORTB && ~PORTB0){
+  96               		.loc 1 19 0
+  97 004a 85B1      		in r24,0x5
+  98 004c 8823      		tst r24
+  99 004e 01F0      		breq .L5
+  20:main.c        **** 		TCNT0 = 0;
+ 100               		.loc 1 20 0
+ 101 0050 16BC      		out 0x26,__zero_reg__
+  21:main.c        **** 	    TIMSK0 = (1<<TOIE0);//set timer overflow interrupts
+ 102               		.loc 1 21 0
+ 103 0052 81E0      		ldi r24,lo8(1)
+ 104 0054 8093 6E00 		sts 110,r24
+  22:main.c        **** 	    TCCR0B = (1<<CS02)|(1<<CS00);//set clock divider (1024) for timer
+ 105               		.loc 1 22 0
+ 106 0058 85E0      		ldi r24,lo8(5)
+ 107 005a 85BD      		out 0x25,r24
+ 108 005c 00C0      		rjmp .L4
+ 109               	.L5:
+  23:main.c        **** 	}else{
+  24:main.c        **** 		if(totalcounter == incrementer)
+ 110               		.loc 1 24 0
+ 111 005e 9091 0000 		lds r25,totalcounter
+ 112 0062 8091 0000 		lds r24,incrementer
+ 113 0066 9813      		cpse r25,r24
+ 114 0068 00C0      		rjmp .L4
+  25:main.c        **** 			PORTB ^= PORTB1;
+ 115               		.loc 1 25 0
+ 116 006a 95B1      		in r25,0x5
+ 117 006c 81E0      		ldi r24,lo8(1)
+ 118 006e 8927      		eor r24,r25
+ 119 0070 85B9      		out 0x5,r24
+ 120               	.L4:
+ 121               	/* epilogue start */
+  26:main.c        **** 	}
+  27:main.c        **** 
+  28:main.c        **** }
+ 122               		.loc 1 28 0
+ 123 0072 9F91      		pop r25
+ 124 0074 8F91      		pop r24
+ 125 0076 0F90      		pop r0
+ 126 0078 0FBE      		out __SREG__,r0
+ 127 007a 0F90      		pop r0
+ 128 007c 1F90      		pop r1
+ 129 007e 1895      		reti
+ 130               		.cfi_endproc
+ 131               	.LFE1:
+ 133               	.global	main
+ 135               	main:
+ 136               	.LFB2:
+  29:main.c        **** 
+  30:main.c        **** int main(void){
+ 137               		.loc 1 30 0
+ 138               		.cfi_startproc
+ 139               	/* prologue: function */
+ 140               	/* frame size = 0 */
+ 141               	/* stack size = 0 */
+ 142               	.L__stack_usage = 0
+  31:main.c        ****     DDRB = 0xFD;//all outputs
+ 143               		.loc 1 31 0
+ 144 0080 8DEF      		ldi r24,lo8(-3)
+ 145 0082 84B9      		out 0x4,r24
+  32:main.c        ****     PCICR= (1<<PCIE0);//enable pin change interrupts
+ 146               		.loc 1 32 0
+ 147 0084 81E0      		ldi r24,lo8(1)
+ 148 0086 8093 6800 		sts 104,r24
+  33:main.c        ****     PCMSK0 = (1<<PCINT0);//set pin change interrupt on pin 0
+ 149               		.loc 1 33 0
+ 150 008a 8093 6B00 		sts 107,r24
+ 151               	.L8:
+  34:main.c        ****     while(1){
+  35:main.c        ****     	asm("SEI");
+ 152               		.loc 1 35 0 discriminator 1
+ 153               	/* #APP */
+ 154               	 ;  35 "main.c" 1
+ 155 008e 7894      		SEI
+ 156               	 ;  0 "" 2
+  36:main.c        ****     	asm("sleep");
+ 157               		.loc 1 36 0 discriminator 1
+ 158               	 ;  36 "main.c" 1
+ 159 0090 8895      		sleep
+ 160               	 ;  0 "" 2
+ 161               	/* #NOAPP */
+ 162 0092 00C0      		rjmp .L8
+ 163               		.cfi_endproc
+ 164               	.LFE2:
+ 166               	.global	totalcounter
+ 167               		.section .bss
+ 170               	totalcounter:
+ 171 0000 00        		.zero	1
+ 172               	.global	incrementer
+ 175               	incrementer:
+ 176 0001 00        		.zero	1
+ 177               		.text
+ 178               	.Letext0:
+ 179               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccAzXA1f.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccAzXA1f.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccAzXA1f.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccAzXA1f.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccAzXA1f.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccAzXA1f.s:12     .text:0000000000000000 __vector_16
+     /tmp/ccAzXA1f.s:170    .bss:0000000000000000 totalcounter
+     /tmp/ccAzXA1f.s:175    .bss:0000000000000001 incrementer
+     /tmp/ccAzXA1f.s:69     .text:000000000000003c __vector_3
+     /tmp/ccAzXA1f.s:135    .text:0000000000000080 main
+
+UNDEFINED SYMBOLS
+__do_clear_bss
