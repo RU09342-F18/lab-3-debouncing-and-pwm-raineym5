@@ -4,35 +4,46 @@
 
 #define F_CPU 8000000UL 
 
-volatile uint8_t incrementer=0,totalcounter=0;
+//button: PB0
+//LED: PB1
+volatile uint8_t hit=0,miss=0,totalcounter=0;
 
-ISR(TIMER0_OVF_vect){
+ISR(TIMER1_OVF_vect){
 	totalcounter++;
-	if(PORTB && PORTB0)
-		incrementer++;
+	if((PINB & (1<<PB3))==0)
+		hit++;
+	else
+		miss++;
 	if(totalcounter==30){
-		    TCCR0B = 0;//kill timer
+		if(hit >= miss){
+			PORTB ^= (1<<PB4);
+		}
+		TCCR1 = 0;//kill timer
+		GIMSK |= (1<<PCIE);//set pin change interrupts
+		hit=0;
+		miss=0;
+		totalcounter=0;
 	}
-	
 }
 ISR(PCINT0_vect){
-	if(PORTB && PORTB0){
-		TCNT0 = 0;
-	    TIFR = (1<<TOV0);//set timer overflow interrupts
-	    TCCR0B = (1<<CS02)|(1<<CS00);//set clock divider (1024) for timer
-	}else{
-		if(totalcounter == incrementer)
-			PORTB ^= PORTB1;
-	}
 
+	if((PINB & (1<<PB3))==0){
+
+    	GIMSK =0;//clear pin change interrupts
+		TCNT1 = 0;
+	    TIMSK = (1<<TOIE1);//set timer overflow interrupts
+	    TCCR1 = (1<<CS12);//set clock divider (8) for timer
+	}
 }
 
 int main(void){
-    DDRB = 0xFD;//all outputs
+    DDRB = ~(1<<PB3);//all outputs except PB3
+    PORTB = ~(1<<PB3);
     GIMSK = (1<<PCIE);//set pin change interrupts
-    PCMSK = (1<<PCINT0);//set pin change interrupt on pin 0
+    PCMSK = (1<<PCINT3);//set pin change interrupt on pin 3
+    PORTB = (1<<PORTB3);//set the pullup on PB3
     while(1){
-    	asm("sei");
+    	sei();
     	asm("sleep");
 	}
 }
