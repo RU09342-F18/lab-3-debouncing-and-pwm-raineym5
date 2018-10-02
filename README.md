@@ -19,10 +19,13 @@ This lab will use the following micros:
 ## Advantages of AVR
 AVR has several advantages. These include:
 * Significantly more compiler/community support and much better compiler
-* Lower cost
+* Significantly more current sourcing and sinking (20 mA/GPIO, 200mA total for ALL avrs)
+* Generally lower cost
 * (typically) more flash, ram, eeprom
 * 8-bit (useful for uart)
+* Generates significantly smaller code
 * 5v tolerant (1.8 - 5.5v)
+* More tolerant BOD
 * 2-cycle 16-bit arithmetic and more advanced hardware multiplier
 * Almost all uC's have DIP variants making prototyping easier
 * More advanced UART transceiver
@@ -36,4 +39,5 @@ There is not much of a difference between the two, but the MSP430 does have a fe
 * 12 (vs 10) bit ADC
 * Less feature creep
 * Moderately lower power
+* MUCH faster clock startup time
 
