@@ -11,7 +11,7 @@ This lab will use the following micros:
 * ATTiny85
 * ATTiny13A
 
-~And Possibly~
+And Possibly
 * ATTiny88
 * ATTiny24
 * ATTiny10
