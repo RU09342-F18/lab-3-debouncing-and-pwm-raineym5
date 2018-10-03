@@ -4,7 +4,7 @@
 
 #define F_CPU 8000000UL 
 
-//button: PB0
+//button: PB0 
 //LED: PB1
 volatile uint8_t hit=0,miss=0,totalcounter=0;
 
