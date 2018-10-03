@@ -5,7 +5,7 @@
 #define F_CPU 8000000UL 
 
 
-//LED: PB4
+//LED: PB4 
 //BUT: PB3
 //LOG LED values: 125-125log(10-n) for n=1:10
 //1: 0
