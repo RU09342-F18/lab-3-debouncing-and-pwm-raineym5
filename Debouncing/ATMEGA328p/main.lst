@@ -1,0 +1,249 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	__vector_16
+  12               	__vector_16:
+  13               	.LFB0:
+  14               		.file 1 "main.c"
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <stdint.h>
+   3:main.c        **** #include <avr/interrupt.h>
+   4:main.c        **** 
+   5:main.c        **** #define F_CPU 8000000UL 
+   6:main.c        **** //PB1: button
+   7:main.c        **** //PB2: LED
+   8:main.c        **** volatile uint8_t hit=0,miss=0,totalcounter=0;
+   9:main.c        **** ISR(TIMER0_OVF_vect){
+  15               		.loc 1 9 0
+  16               		.cfi_startproc
+  17 0000 1F92      		push r1
+  18               	.LCFI0:
+  19               		.cfi_def_cfa_offset 3
+  20               		.cfi_offset 1, -2
+  21 0002 0F92      		push r0
+  22               	.LCFI1:
+  23               		.cfi_def_cfa_offset 4
+  24               		.cfi_offset 0, -3
+  25 0004 0FB6      		in r0,__SREG__
+  26 0006 0F92      		push r0
+  27 0008 1124      		clr __zero_reg__
+  28 000a 8F93      		push r24
+  29               	.LCFI2:
+  30               		.cfi_def_cfa_offset 5
+  31               		.cfi_offset 24, -4
+  32 000c 9F93      		push r25
+  33               	.LCFI3:
+  34               		.cfi_def_cfa_offset 6
+  35               		.cfi_offset 25, -5
+  36               	/* prologue: Signal */
+  37               	/* frame size = 0 */
+  38               	/* stack size = 5 */
+  39               	.L__stack_usage = 5
+  10:main.c        **** 	totalcounter++;
+  40               		.loc 1 10 0
+  41 000e 8091 0000 		lds r24,totalcounter
+  42 0012 8F5F      		subi r24,lo8(-(1))
+  43 0014 8093 0000 		sts totalcounter,r24
+  11:main.c        **** 	if((PINB & (1<<PB3))==0)
+  44               		.loc 1 11 0
+  45 0018 1B99      		sbic 0x3,3
+  46 001a 00C0      		rjmp .L2
+  12:main.c        **** 		hit++;
+  47               		.loc 1 12 0
+  48 001c 8091 0000 		lds r24,hit
+  49 0020 8F5F      		subi r24,lo8(-(1))
+  50 0022 8093 0000 		sts hit,r24
+  51 0026 00C0      		rjmp .L3
+  52               	.L2:
+  13:main.c        **** 	else
+  14:main.c        **** 		miss++;
+  53               		.loc 1 14 0
+  54 0028 8091 0000 		lds r24,miss
+  55 002c 8F5F      		subi r24,lo8(-(1))
+  56 002e 8093 0000 		sts miss,r24
+  57               	.L3:
+  15:main.c        **** 	if(totalcounter==30){
+  58               		.loc 1 15 0
+  59 0032 8091 0000 		lds r24,totalcounter
+  60 0036 8E31      		cpi r24,lo8(30)
+  61 0038 01F4      		brne .L1
+  16:main.c        **** 		if(hit >= miss){
+  62               		.loc 1 16 0
+  63 003a 9091 0000 		lds r25,hit
+  64 003e 8091 0000 		lds r24,miss
+  65 0042 9817      		cp r25,r24
+  66 0044 00F0      		brlo .L5
+  17:main.c        **** 			PORTB ^= (1<<PB0);
+  67               		.loc 1 17 0
+  68 0046 95B1      		in r25,0x5
+  69 0048 81E0      		ldi r24,lo8(1)
+  70 004a 8927      		eor r24,r25
+  71 004c 85B9      		out 0x5,r24
+  72               	.L5:
+  18:main.c        **** 		}
+  19:main.c        **** 		TCCR0B = 0;//kill timer
+  73               		.loc 1 19 0
+  74 004e 15BC      		out 0x25,__zero_reg__
+  20:main.c        ****     	PCMSK0 = (1<<PCINT0);//set pin change interrupt on PB0
+  75               		.loc 1 20 0
+  76 0050 81E0      		ldi r24,lo8(1)
+  77 0052 8093 6B00 		sts 107,r24
+  21:main.c        **** 		hit=0;
+  78               		.loc 1 21 0
+  79 0056 1092 0000 		sts hit,__zero_reg__
+  22:main.c        **** 		miss=0;
+  80               		.loc 1 22 0
+  81 005a 1092 0000 		sts miss,__zero_reg__
+  23:main.c        **** 		totalcounter=0;
+  82               		.loc 1 23 0
+  83 005e 1092 0000 		sts totalcounter,__zero_reg__
+  84               	.L1:
+  85               	/* epilogue start */
+  24:main.c        **** 	}
+  25:main.c        **** 	
+  26:main.c        **** }
+  86               		.loc 1 26 0
+  87 0062 9F91      		pop r25
+  88 0064 8F91      		pop r24
+  89 0066 0F90      		pop r0
+  90 0068 0FBE      		out __SREG__,r0
+  91 006a 0F90      		pop r0
+  92 006c 1F90      		pop r1
+  93 006e 1895      		reti
+  94               		.cfi_endproc
+  95               	.LFE0:
+  97               	.global	__vector_3
+  99               	__vector_3:
+ 100               	.LFB1:
+  27:main.c        **** ISR(PCINT0_vect){
+ 101               		.loc 1 27 0
+ 102               		.cfi_startproc
+ 103 0070 1F92      		push r1
+ 104               	.LCFI4:
+ 105               		.cfi_def_cfa_offset 3
+ 106               		.cfi_offset 1, -2
+ 107 0072 0F92      		push r0
+ 108               	.LCFI5:
+ 109               		.cfi_def_cfa_offset 4
+ 110               		.cfi_offset 0, -3
+ 111 0074 0FB6      		in r0,__SREG__
+ 112 0076 0F92      		push r0
+ 113 0078 1124      		clr __zero_reg__
+ 114 007a 8F93      		push r24
+ 115               	.LCFI6:
+ 116               		.cfi_def_cfa_offset 5
+ 117               		.cfi_offset 24, -4
+ 118               	/* prologue: Signal */
+ 119               	/* frame size = 0 */
+ 120               	/* stack size = 4 */
+ 121               	.L__stack_usage = 4
+  28:main.c        **** 	if((PINB & (1<<PB3))==0){
+ 122               		.loc 1 28 0
+ 123 007c 1B99      		sbic 0x3,3
+ 124 007e 00C0      		rjmp .L6
+  29:main.c        **** 		TCNT0 = 0;
+ 125               		.loc 1 29 0
+ 126 0080 16BC      		out 0x26,__zero_reg__
+  30:main.c        **** 		PCMSK0 = 0;//clear pin change interrupts
+ 127               		.loc 1 30 0
+ 128 0082 1092 6B00 		sts 107,__zero_reg__
+  31:main.c        **** 	    TIMSK0 = (1<<TOIE0);//set timer overflow interrupts
+ 129               		.loc 1 31 0
+ 130 0086 81E0      		ldi r24,lo8(1)
+ 131 0088 8093 6E00 		sts 110,r24
+  32:main.c        **** 	    TCCR0B = (1<<CS01);//set clock divider (8) for timer
+ 132               		.loc 1 32 0
+ 133 008c 82E0      		ldi r24,lo8(2)
+ 134 008e 85BD      		out 0x25,r24
+ 135               	.L6:
+ 136               	/* epilogue start */
+  33:main.c        **** 	}
+  34:main.c        **** 
+  35:main.c        **** }
+ 137               		.loc 1 35 0
+ 138 0090 8F91      		pop r24
+ 139 0092 0F90      		pop r0
+ 140 0094 0FBE      		out __SREG__,r0
+ 141 0096 0F90      		pop r0
+ 142 0098 1F90      		pop r1
+ 143 009a 1895      		reti
+ 144               		.cfi_endproc
+ 145               	.LFE1:
+ 147               	.global	main
+ 149               	main:
+ 150               	.LFB2:
+  36:main.c        **** 
+  37:main.c        **** int main(void){
+ 151               		.loc 1 37 0
+ 152               		.cfi_startproc
+ 153               	/* prologue: function */
+ 154               	/* frame size = 0 */
+ 155               	/* stack size = 0 */
+ 156               	.L__stack_usage = 0
+  38:main.c        ****     DDRB = ~(1<<PB1);//all outputs
+ 157               		.loc 1 38 0
+ 158 009c 8DEF      		ldi r24,lo8(-3)
+ 159 009e 84B9      		out 0x4,r24
+  39:main.c        ****     PORTB = (1<<PB1);
+ 160               		.loc 1 39 0
+ 161 00a0 82E0      		ldi r24,lo8(2)
+ 162 00a2 85B9      		out 0x5,r24
+  40:main.c        ****     PCICR = (1<<PCIE0);//enable pin change interrupts
+ 163               		.loc 1 40 0
+ 164 00a4 81E0      		ldi r24,lo8(1)
+ 165 00a6 8093 6800 		sts 104,r24
+  41:main.c        ****     PCMSK0 = (1<<PCINT0);//set pin change interrupt on PB0
+ 166               		.loc 1 41 0
+ 167 00aa 8093 6B00 		sts 107,r24
+ 168               	.L9:
+  42:main.c        ****     while(1){
+  43:main.c        ****     	asm("SEI");
+ 169               		.loc 1 43 0 discriminator 1
+ 170               	/* #APP */
+ 171               	 ;  43 "main.c" 1
+ 172 00ae 7894      		SEI
+ 173               	 ;  0 "" 2
+  44:main.c        ****     	asm("sleep");
+ 174               		.loc 1 44 0 discriminator 1
+ 175               	 ;  44 "main.c" 1
+ 176 00b0 8895      		sleep
+ 177               	 ;  0 "" 2
+ 178               	/* #NOAPP */
+ 179 00b2 00C0      		rjmp .L9
+ 180               		.cfi_endproc
+ 181               	.LFE2:
+ 183               	.global	totalcounter
+ 184               		.section .bss
+ 187               	totalcounter:
+ 188 0000 00        		.zero	1
+ 189               	.global	miss
+ 192               	miss:
+ 193 0001 00        		.zero	1
+ 194               	.global	hit
+ 197               	hit:
+ 198 0002 00        		.zero	1
+ 199               		.text
+ 200               	.Letext0:
+ 201               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccZtWrsg.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccZtWrsg.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccZtWrsg.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccZtWrsg.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccZtWrsg.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccZtWrsg.s:12     .text:0000000000000000 __vector_16
+     /tmp/ccZtWrsg.s:187    .bss:0000000000000000 totalcounter
+     /tmp/ccZtWrsg.s:197    .bss:0000000000000002 hit
+     /tmp/ccZtWrsg.s:192    .bss:0000000000000001 miss
+     /tmp/ccZtWrsg.s:99     .text:0000000000000070 __vector_3
+     /tmp/ccZtWrsg.s:149    .text:000000000000009c main
+
+UNDEFINED SYMBOLS
+__do_clear_bss
