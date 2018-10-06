@@ -1,18 +1,16 @@
 # Hardware PWM
-Now that you have done the software version of PWM, now it is time to start leveraging the other features of these Timer Modules.
+This is a relatively straight forward program that simply toggles an LED using the built-in timer0 module running in fastPWM. This was built using AVR-GCC 5.4.0 on linux using a makefile. 
 
-## Task
-You need to replicate the same behavior as in the software PWM, only using the Timer Modules ability to directly output to a GPIO Pin instead of managing them in software. One way to thing about what should happen is that unless your are doing some other things in your code, your system should initialize, set the Timer Modules, and then turn off the CPU.
+I included videos for this program, but only this program since it's cumulative and the video files are massive relative to the rest of the project. Even downconverted from 4k60 to 640x480 10fps, they're still large. They should be available in this folder.
 
-## Deliverables
-You will need to have two folders in this repository, one for each of the processors that you used for this part of the lab. Remember to replace this README with your own.
+## ATtiny85
+For this board, the code sets all outputs to zero except for the button, enabling the pullup resistor. It enables timer0 in fastPWM where TOP is 125 instead of 255. It then enables pin change interrupts and sets the timer perscalar, which enables the timer. 
 
-### Hints
-Read up on the P1SEL registers as well as look at the Timer modules ability to multiplex.
+The timer operates at 1 KHz at 50% duty cycle until a button interrupt is fired. When this happens, timer1 is turned on and used for debouncing. When the timer overflows, it checks whether the button is still pressed. After 30 overflows, if the amount of overflows where is was pressed is greater then the amount of times where it wasn't, then it counts as a button press. 
 
-## Extra Work
-### Using ACLK
-Some of these microprocessors have a built in ACLK which is extremely slow compared to your up to 25MHz available on some of them. What is the overall impact on the system when using this clock? Can you actually use your PWM code with a clock that slow?
+When a button press is registered, a counter increments and sets the fastPWM value to the next value in the array of logarithmic values. 
+Any time the program is not in an ISR, the processor is sleeping in "idle", where the CPU is sleeping but all the peripherals are untouched.
 
-### Ultra Low Power
-Using a combination of ACLK, Low Power Modes, and any other means you may deem necessary, optimize this PWM code to run at 50% duty cycle with a LED on the MSP430FR5994. In particular, time how long your code can run on the fully charged super capacitor. You do not need to worry about the button control in this case, and you will probably want to disable all the GPIO that you are not using (nudge, nudge, hint, hint).
+
+## ATtiny13a
+This code does exactly the same thing, except since this is a very basic microcontroller, it doesn't have a second timer. The debouncing code is done in the ISR. This is a bad practice, but since this is the only ISR executing in this program, there isn't a conflict. 
