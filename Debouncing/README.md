@@ -1,18 +1,12 @@
-# Software Debouncing
-In previous labs, we talked about how objects such as switches can cause some nasty effects since they are actually a mechanical system at heart. We talked about the simple hardware method of debouncing, but due to the many different design constraints, you may not be able to add or adjust hardware. Debouncing is also only one of many applications which would require the use of built in Timers to allow for other processes to take place.
+# Debouncing
+This is a relatively straight forward program that simply toggles an LED using the built-in timer0 module running in fastPWM. This was built using AVR-GCC 5.4.0 on linux using a makefile. 
 
-## Task
-You need to utilize the TIMER modules within the MSP430 processors to implement a debounced switch to control the state of an LED. You most likely will want to hook up your buttons on the development boards to an oscilloscope to see how much time it takes for the buttons to settle. The idea here is that your processor should be able to run other code, while relying on timers and interrupts to manage the debouncing in the background. *You should not be using polling techniques for this assignment.*
+## ATtiny85
+For this board, the code sets all outputs to zero except for the button, enabling the pullup resistor. It then enables pin change interrupts, and goes to sleep, waiting for a button interrupt. 
 
-## Deliverables
-You will need to have two folders in this repository, one for each of the processors that you used for this part of the lab. Remember to replace this README with your own.
+When a button interrupt occurs, the ISR checks if it is a low-high or high-low transition. Since the button pulls down the input, the only transition we care about here is the high-low transition. When this happens, it enables timer0 and waits for an overflow. On each overflow, the timer ISR checks if the button is pressed. After 30 overflows, the timer is disabled and if the amount of presses is higher than the amount of times the button isn't pressed, it counts as a button press and the code toggles the LED.
 
-### Hints
-You need to take a look at how the P1IE and P1IES registers work and how to control them within an interrupt routine. Remember that the debouncing is not going to be the main process you are going to run by the end of the lab.
+Any time the code is not in an ISR, the program is sleeping in "IDLE".
 
-## Extra Work
-### Low Power Modes
-Go into the datasheets or look online for information about the low power modes of your processors and using Energy Trace, see what the lowest power consumption you can achieve while still running your debouncing code. Take a note when your processor is not driving the LED (or unplug the header connecting the LED and check) but running the interrupt routine for your debouncing.
-
-### Double the fun
-Can you expand your code to debounce two switches? Do you have to use two Timer peripherals to do this?
+## ATMEGA328P
+This code does exactly the same thing, but using different register names. 
