@@ -1,0 +1,285 @@
+   1               		.file	"main.c"
+   2               	__SP_L__ = 0x3d
+   3               	__SREG__ = 0x3f
+   4               	__tmp_reg__ = 0
+   5               	__zero_reg__ = 1
+   8               		.text
+   9               	.Ltext0:
+ 102               	.global	__vector_2
+ 104               	__vector_2:
+ 105               		.stabd	46,0,0
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <stdint.h>
+   3:main.c        **** #include <avr/interrupt.h>
+   4:main.c        **** 
+   5:main.c        **** #define F_CPU 8000000UL 
+   6:main.c        **** 
+   7:main.c        **** 
+   8:main.c        **** //LED: PB4
+   9:main.c        **** //BUT: PB3 
+  10:main.c        **** //LOG LED values: 69-69log(10-n) for n=1:10
+  11:main.c        **** //0: 0
+  12:main.c        **** //1: 3
+  13:main.c        **** //2: 7
+  14:main.c        **** //3: 11
+  15:main.c        **** //4: 15
+  16:main.c        **** //5: 21
+  17:main.c        **** //6: 28
+  18:main.c        **** //7: 36
+  19:main.c        **** //8: 48
+  20:main.c        **** //9: 69
+  21:main.c        **** 
+  22:main.c        **** 
+  23:main.c        **** volatile uint8_t lookupcounter = 4, incrementer=0,hit=0,miss=0,totalcounter=0;
+  24:main.c        **** const uint8_t LOOKUP[] = {0,3,7,11,15,21,28,36,48,69};
+  25:main.c        **** 
+  26:main.c        **** ISR(PCINT0_vect){
+ 107               	.LM0:
+ 108               	.LFBB1:
+ 109 0000 1F92      		push r1
+ 110 0002 0F92      		push r0
+ 111 0004 0FB6      		in r0,__SREG__
+ 112 0006 0F92      		push r0
+ 113 0008 1124      		clr __zero_reg__
+ 114 000a 8F93      		push r24
+ 115 000c 9F93      		push r25
+ 116 000e EF93      		push r30
+ 117 0010 FF93      		push r31
+ 118               	/* prologue: Signal */
+ 119               	/* frame size = 0 */
+ 120               	/* stack size = 7 */
+ 121               	.L__stack_usage = 7
+  27:main.c        **** 
+  28:main.c        **** 	if(((PINB & (1<<PB3)))==(1<<PB3)){//button down only
+ 123               	.LM1:
+ 124 0012 B39B      		sbis 0x16,3
+ 125 0014 00C0      		rjmp .L1
+ 126               	.L11:
+  29:main.c        **** 		while(totalcounter < 30){//can do this in the ISR since it's the only interrupt. Still bad practi
+ 128               	.LM2:
+ 129 0016 8091 0000 		lds r24,totalcounter
+ 130 001a 8E31      		cpi r24,lo8(30)
+ 131 001c 00F4      		brsh .L13
+ 132               	.L9:
+ 133 001e 8EE1      		ldi r24,lo8(30)
+ 134               	.L4:
+ 135               	.LBB2:
+  30:main.c        **** 			for(uint8_t i=0;i<30;i++)
+  31:main.c        **** 				asm("nop");
+ 137               	.LM3:
+ 138               	/* #APP */
+ 139               	 ;  31 "main.c" 1
+ 140 0020 0000      		nop
+ 141               	 ;  0 "" 2
+ 142               	/* #NOAPP */
+ 143 0022 8150      		subi r24,lo8(-(-1))
+  30:main.c        **** 			for(uint8_t i=0;i<30;i++)
+ 145               	.LM4:
+ 146 0024 01F4      		brne .L4
+ 147               	.LBE2:
+  32:main.c        **** 			totalcounter++;
+ 149               	.LM5:
+ 150 0026 8091 0000 		lds r24,totalcounter
+ 151 002a 8F5F      		subi r24,lo8(-(1))
+ 152 002c 8093 0000 		sts totalcounter,r24
+  33:main.c        **** 			if((PINB & (1<<PB3))==(1<<PB3))//check for button down
+ 154               	.LM6:
+ 155 0030 B39B      		sbis 0x16,3
+ 156 0032 00C0      		rjmp .L5
+  34:main.c        **** 				hit++;
+ 158               	.LM7:
+ 159 0034 8091 0000 		lds r24,hit
+ 160 0038 8F5F      		subi r24,lo8(-(1))
+ 161 003a 8093 0000 		sts hit,r24
+  29:main.c        **** 			for(uint8_t i=0;i<30;i++)
+ 163               	.LM8:
+ 164 003e 8091 0000 		lds r24,totalcounter
+ 165 0042 8E31      		cpi r24,lo8(30)
+ 166 0044 00F0      		brlo .L9
+ 167               	.L13:
+  35:main.c        **** 			else
+  36:main.c        **** 				miss++;
+  37:main.c        **** 		}
+  38:main.c        **** 		if(hit > miss){
+ 169               	.LM9:
+ 170 0046 9091 0000 		lds r25,hit
+ 171 004a 8091 0000 		lds r24,miss
+ 172 004e 8917      		cp r24,r25
+ 173 0050 00F4      		brsh .L7
+  39:main.c        **** 			lookupcounter++;
+ 175               	.LM10:
+ 176 0052 8091 0000 		lds r24,lookupcounter
+ 177 0056 8F5F      		subi r24,lo8(-(1))
+ 178 0058 8093 0000 		sts lookupcounter,r24
+  40:main.c        **** 			if(lookupcounter == 10)
+ 180               	.LM11:
+ 181 005c 8091 0000 		lds r24,lookupcounter
+ 182 0060 8A30      		cpi r24,lo8(10)
+ 183 0062 01F0      		breq .L14
+ 184               	.L8:
+  41:main.c        **** 				lookupcounter=0;
+  42:main.c        **** 			OCR0B = LOOKUP[lookupcounter];
+ 186               	.LM12:
+ 187 0064 E091 0000 		lds r30,lookupcounter
+ 188 0068 F0E0      		ldi r31,0
+ 189 006a E050      		subi r30,lo8(-(LOOKUP))
+ 190 006c F040      		sbci r31,hi8(-(LOOKUP))
+ 191 006e 8081      		ld r24,Z
+ 192 0070 89BD      		out 0x29,r24
+ 193               	.L7:
+  43:main.c        **** 		}
+  44:main.c        **** 		hit=0;
+ 195               	.LM13:
+ 196 0072 1092 0000 		sts hit,__zero_reg__
+  45:main.c        **** 		miss=0;
+ 198               	.LM14:
+ 199 0076 1092 0000 		sts miss,__zero_reg__
+  46:main.c        **** 		totalcounter=0;
+ 201               	.LM15:
+ 202 007a 1092 0000 		sts totalcounter,__zero_reg__
+ 203               	.L1:
+ 204               	/* epilogue start */
+  47:main.c        **** 	}
+  48:main.c        **** }
+ 206               	.LM16:
+ 207 007e FF91      		pop r31
+ 208 0080 EF91      		pop r30
+ 209 0082 9F91      		pop r25
+ 210 0084 8F91      		pop r24
+ 211 0086 0F90      		pop r0
+ 212 0088 0FBE      		out __SREG__,r0
+ 213 008a 0F90      		pop r0
+ 214 008c 1F90      		pop r1
+ 215 008e 1895      		reti
+ 216               	.L5:
+  36:main.c        **** 		}
+ 218               	.LM17:
+ 219 0090 8091 0000 		lds r24,miss
+ 220 0094 8F5F      		subi r24,lo8(-(1))
+ 221 0096 8093 0000 		sts miss,r24
+ 222 009a 00C0      		rjmp .L11
+ 223               	.L14:
+  41:main.c        **** 			OCR0B = LOOKUP[lookupcounter];
+ 225               	.LM18:
+ 226 009c 1092 0000 		sts lookupcounter,__zero_reg__
+ 227 00a0 00C0      		rjmp .L8
+ 229               	.Lscope1:
+ 231               		.stabd	78,0,0
+ 232               		.section	.text.startup,"ax",@progbits
+ 234               	.global	main
+ 236               	main:
+ 237               		.stabd	46,0,0
+  49:main.c        **** 
+  50:main.c        **** int main(void){
+ 239               	.LM19:
+ 240               	.LFBB2:
+ 241               	/* prologue: function */
+ 242               	/* frame size = 0 */
+ 243               	/* stack size = 0 */
+ 244               	.L__stack_usage = 0
+  51:main.c        **** 
+  52:main.c        ****     DDRB = ~(1<<PB3);//all outputs except PB3
+ 246               	.LM20:
+ 247 0000 87EF      		ldi r24,lo8(-9)
+ 248 0002 87BB      		out 0x17,r24
+  53:main.c        ****     OCR0A = 69;//CTC value for 1 KHz
+ 250               	.LM21:
+ 251 0004 85E4      		ldi r24,lo8(69)
+ 252 0006 86BF      		out 0x36,r24
+  54:main.c        **** 	OCR0B = 33;
+ 254               	.LM22:
+ 255 0008 81E2      		ldi r24,lo8(33)
+ 256 000a 89BD      		out 0x29,r24
+  55:main.c        ****     PORTB = (1<<PB3);//turn on pullups
+ 258               	.LM23:
+ 259 000c 98E0      		ldi r25,lo8(8)
+ 260 000e 98BB      		out 0x18,r25
+  56:main.c        ****     
+  57:main.c        ****     GIMSK = (1<<PCIE);//set pin change interrupts
+ 262               	.LM24:
+ 263 0010 20E2      		ldi r18,lo8(32)
+ 264 0012 2BBF      		out 0x3b,r18
+  58:main.c        ****     PCMSK = (1<<PCINT3);//set pin change interrupt on pin PB3 in specific
+ 266               	.LM25:
+ 267 0014 95BB      		out 0x15,r25
+  59:main.c        ****     TCCR0A = (1<<WGM00)|(1<<COM0B1);//clear timer on compare with OCR0A
+ 269               	.LM26:
+ 270 0016 8FBD      		out 0x2f,r24
+  60:main.c        ****     TCCR0B = (1<<CS01)|(1<<WGM02);//8 prescalar, fast pwm
+ 272               	.LM27:
+ 273 0018 8AE0      		ldi r24,lo8(10)
+ 274 001a 83BF      		out 0x33,r24
+ 275               	.L16:
+  61:main.c        **** 
+  62:main.c        **** 
+  63:main.c        ****     while(1){
+  64:main.c        ****     	sei();
+ 277               	.LM28:
+ 278               	/* #APP */
+ 279               	 ;  64 "main.c" 1
+ 280 001c 7894      		sei
+ 281               	 ;  0 "" 2
+  65:main.c        ****     	asm("sleep");//sleep mode idle
+ 283               	.LM29:
+ 284               	 ;  65 "main.c" 1
+ 285 001e 8895      		sleep
+ 286               	 ;  0 "" 2
+  66:main.c        **** 	}
+ 288               	.LM30:
+ 289               	/* #NOAPP */
+ 290 0020 00C0      		rjmp .L16
+ 292               	.Lscope2:
+ 294               		.stabd	78,0,0
+ 295               	.global	LOOKUP
+ 296               		.section	.rodata
+ 299               	LOOKUP:
+ 300 0000 00        		.byte	0
+ 301 0001 03        		.byte	3
+ 302 0002 07        		.byte	7
+ 303 0003 0B        		.byte	11
+ 304 0004 0F        		.byte	15
+ 305 0005 15        		.byte	21
+ 306 0006 1C        		.byte	28
+ 307 0007 24        		.byte	36
+ 308 0008 30        		.byte	48
+ 309 0009 45        		.byte	69
+ 310               	.global	totalcounter
+ 311               		.section .bss
+ 314               	totalcounter:
+ 315 0000 00        		.zero	1
+ 316               	.global	miss
+ 319               	miss:
+ 320 0001 00        		.zero	1
+ 321               	.global	hit
+ 324               	hit:
+ 325 0002 00        		.zero	1
+ 326               	.global	incrementer
+ 329               	incrementer:
+ 330 0003 00        		.zero	1
+ 331               	.global	lookupcounter
+ 332               		.data
+ 335               	lookupcounter:
+ 336 0000 04        		.byte	4
+ 343               		.text
+ 345               	.Letext0:
+ 346               		.ident	"GCC: (GNU) 4.9.2"
+ 347               	.global __do_copy_data
+ 348               	.global __do_clear_bss
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/cc5ykP8U.s:2      *ABS*:000000000000003d __SP_L__
+     /tmp/cc5ykP8U.s:3      *ABS*:000000000000003f __SREG__
+     /tmp/cc5ykP8U.s:4      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cc5ykP8U.s:5      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cc5ykP8U.s:104    .text:0000000000000000 __vector_2
+     /tmp/cc5ykP8U.s:314    .bss:0000000000000000 totalcounter
+     /tmp/cc5ykP8U.s:324    .bss:0000000000000002 hit
+     /tmp/cc5ykP8U.s:319    .bss:0000000000000001 miss
+     /tmp/cc5ykP8U.s:335    .data:0000000000000000 lookupcounter
+     /tmp/cc5ykP8U.s:299    .rodata:0000000000000000 LOOKUP
+     /tmp/cc5ykP8U.s:236    .text.startup:0000000000000000 main
+     /tmp/cc5ykP8U.s:329    .bss:0000000000000003 incrementer
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
