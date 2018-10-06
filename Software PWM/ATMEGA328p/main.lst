@@ -1,0 +1,408 @@
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	__vector_15
+  12               	__vector_15:
+  13               	.LFB0:
+  14               		.file 1 "main.c"
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <stdint.h>
+   3:main.c        **** #include <avr/interrupt.h>
+   4:main.c        **** 
+   5:main.c        **** #define F_CPU 8000000UL 
+   6:main.c        **** 
+   7:main.c        **** 
+   8:main.c        **** 
+   9:main.c        **** //PB1: button
+  10:main.c        **** //PB2: LED
+  11:main.c        **** //LOG LED values: 125-125log(10-n) for n=1:10
+  12:main.c        **** //1: 0
+  13:main.c        **** //2: 6
+  14:main.c        **** //3: 12
+  15:main.c        **** //4: 19
+  16:main.c        **** //5: 26
+  17:main.c        **** //6: 38
+  18:main.c        **** //7: 50
+  19:main.c        **** //8: 65
+  20:main.c        **** //9: 87
+  21:main.c        **** //10:125
+  22:main.c        **** 
+  23:main.c        **** volatile uint8_t lookupcounter = 4, incrementer=0,hit=0,miss=0,totalcounter=0;
+  24:main.c        **** const uint8_t LOOKUP[] = {0,6,12,19,26,38,50,65,87,125};
+  25:main.c        **** ISR(TIMER0_COMPB_vect){
+  15               		.loc 1 25 0
+  16               		.cfi_startproc
+  17 0000 1F92      		push r1
+  18               	.LCFI0:
+  19               		.cfi_def_cfa_offset 3
+  20               		.cfi_offset 1, -2
+  21 0002 0F92      		push r0
+  22               	.LCFI1:
+  23               		.cfi_def_cfa_offset 4
+  24               		.cfi_offset 0, -3
+  25 0004 0FB6      		in r0,__SREG__
+  26 0006 0F92      		push r0
+  27 0008 1124      		clr __zero_reg__
+  28 000a 8F93      		push r24
+  29               	.LCFI2:
+  30               		.cfi_def_cfa_offset 5
+  31               		.cfi_offset 24, -4
+  32               	/* prologue: Signal */
+  33               	/* frame size = 0 */
+  34               	/* stack size = 4 */
+  35               	.L__stack_usage = 4
+  26:main.c        **** 	if(OCR0B != 125)
+  36               		.loc 1 26 0
+  37 000c 88B5      		in r24,0x28
+  38 000e 8D37      		cpi r24,lo8(125)
+  39 0010 01F0      		breq .L1
+  27:main.c        **** 		PORTB &= ~(1<<PB2);
+  40               		.loc 1 27 0
+  41 0012 2A98      		cbi 0x5,2
+  42               	.L1:
+  43               	/* epilogue start */
+  28:main.c        **** }
+  44               		.loc 1 28 0
+  45 0014 8F91      		pop r24
+  46 0016 0F90      		pop r0
+  47 0018 0FBE      		out __SREG__,r0
+  48 001a 0F90      		pop r0
+  49 001c 1F90      		pop r1
+  50 001e 1895      		reti
+  51               		.cfi_endproc
+  52               	.LFE0:
+  54               	.global	__vector_14
+  56               	__vector_14:
+  57               	.LFB1:
+  29:main.c        **** ISR(TIMER0_COMPA_vect){
+  58               		.loc 1 29 0
+  59               		.cfi_startproc
+  60 0020 1F92      		push r1
+  61               	.LCFI3:
+  62               		.cfi_def_cfa_offset 3
+  63               		.cfi_offset 1, -2
+  64 0022 0F92      		push r0
+  65               	.LCFI4:
+  66               		.cfi_def_cfa_offset 4
+  67               		.cfi_offset 0, -3
+  68 0024 0FB6      		in r0,__SREG__
+  69 0026 0F92      		push r0
+  70 0028 1124      		clr __zero_reg__
+  71 002a 8F93      		push r24
+  72               	.LCFI5:
+  73               		.cfi_def_cfa_offset 5
+  74               		.cfi_offset 24, -4
+  75               	/* prologue: Signal */
+  76               	/* frame size = 0 */
+  77               	/* stack size = 4 */
+  78               	.L__stack_usage = 4
+  30:main.c        **** 	if(OCR0B != 0)
+  79               		.loc 1 30 0
+  80 002c 88B5      		in r24,0x28
+  81 002e 8111      		cpse r24,__zero_reg__
+  31:main.c        **** 		PORTB |= (1<<PB2);
+  82               		.loc 1 31 0
+  83 0030 2A9A      		sbi 0x5,2
+  84               	.L3:
+  85               	/* epilogue start */
+  32:main.c        **** }
+  86               		.loc 1 32 0
+  87 0032 8F91      		pop r24
+  88 0034 0F90      		pop r0
+  89 0036 0FBE      		out __SREG__,r0
+  90 0038 0F90      		pop r0
+  91 003a 1F90      		pop r1
+  92 003c 1895      		reti
+  93               		.cfi_endproc
+  94               	.LFE1:
+  96               	.global	__vector_13
+  98               	__vector_13:
+  99               	.LFB2:
+  33:main.c        **** 
+  34:main.c        **** /////////////////
+  35:main.c        **** 
+  36:main.c        **** ISR(TIMER1_OVF_vect){
+ 100               		.loc 1 36 0
+ 101               		.cfi_startproc
+ 102 003e 1F92      		push r1
+ 103               	.LCFI6:
+ 104               		.cfi_def_cfa_offset 3
+ 105               		.cfi_offset 1, -2
+ 106 0040 0F92      		push r0
+ 107               	.LCFI7:
+ 108               		.cfi_def_cfa_offset 4
+ 109               		.cfi_offset 0, -3
+ 110 0042 0FB6      		in r0,__SREG__
+ 111 0044 0F92      		push r0
+ 112 0046 1124      		clr __zero_reg__
+ 113 0048 8F93      		push r24
+ 114               	.LCFI8:
+ 115               		.cfi_def_cfa_offset 5
+ 116               		.cfi_offset 24, -4
+ 117 004a 9F93      		push r25
+ 118               	.LCFI9:
+ 119               		.cfi_def_cfa_offset 6
+ 120               		.cfi_offset 25, -5
+ 121               	/* prologue: Signal */
+ 122               	/* frame size = 0 */
+ 123               	/* stack size = 5 */
+ 124               	.L__stack_usage = 5
+  37:main.c        **** 	totalcounter++;
+ 125               		.loc 1 37 0
+ 126 004c 8091 0000 		lds r24,totalcounter
+ 127 0050 8F5F      		subi r24,lo8(-(1))
+ 128 0052 8093 0000 		sts totalcounter,r24
+  38:main.c        **** 	if((PINB & (1<<PB3))==0)
+ 129               		.loc 1 38 0
+ 130 0056 1B99      		sbic 0x3,3
+ 131 0058 00C0      		rjmp .L6
+  39:main.c        **** 		hit++;
+ 132               		.loc 1 39 0
+ 133 005a 8091 0000 		lds r24,hit
+ 134 005e 8F5F      		subi r24,lo8(-(1))
+ 135 0060 8093 0000 		sts hit,r24
+ 136 0064 00C0      		rjmp .L7
+ 137               	.L6:
+  40:main.c        **** 	else
+  41:main.c        **** 		miss++;
+ 138               		.loc 1 41 0
+ 139 0066 8091 0000 		lds r24,miss
+ 140 006a 8F5F      		subi r24,lo8(-(1))
+ 141 006c 8093 0000 		sts miss,r24
+ 142               	.L7:
+  42:main.c        **** 	if(totalcounter==30){
+ 143               		.loc 1 42 0
+ 144 0070 8091 0000 		lds r24,totalcounter
+ 145 0074 8E31      		cpi r24,lo8(30)
+ 146 0076 01F4      		brne .L5
+  43:main.c        **** 		if(hit >= miss){
+ 147               		.loc 1 43 0
+ 148 0078 9091 0000 		lds r25,hit
+ 149 007c 8091 0000 		lds r24,miss
+ 150 0080 9817      		cp r25,r24
+ 151 0082 00F0      		brlo .L9
+  44:main.c        **** 			PORTB ^= (1<<PB0);
+ 152               		.loc 1 44 0
+ 153 0084 95B1      		in r25,0x5
+ 154 0086 81E0      		ldi r24,lo8(1)
+ 155 0088 8927      		eor r24,r25
+ 156 008a 85B9      		out 0x5,r24
+ 157               	.L9:
+  45:main.c        **** 		}
+  46:main.c        **** 		TCCR1B = 0;//kill timer
+ 158               		.loc 1 46 0
+ 159 008c 1092 8100 		sts 129,__zero_reg__
+  47:main.c        ****     	PCMSK0 = (1<<PCINT0);//set pin change interrupt on PB0
+ 160               		.loc 1 47 0
+ 161 0090 81E0      		ldi r24,lo8(1)
+ 162 0092 8093 6B00 		sts 107,r24
+  48:main.c        **** 		hit=0;
+ 163               		.loc 1 48 0
+ 164 0096 1092 0000 		sts hit,__zero_reg__
+  49:main.c        **** 		miss=0;
+ 165               		.loc 1 49 0
+ 166 009a 1092 0000 		sts miss,__zero_reg__
+  50:main.c        **** 		totalcounter=0;
+ 167               		.loc 1 50 0
+ 168 009e 1092 0000 		sts totalcounter,__zero_reg__
+ 169               	.L5:
+ 170               	/* epilogue start */
+  51:main.c        **** 	}
+  52:main.c        **** 	
+  53:main.c        **** }
+ 171               		.loc 1 53 0
+ 172 00a2 9F91      		pop r25
+ 173 00a4 8F91      		pop r24
+ 174 00a6 0F90      		pop r0
+ 175 00a8 0FBE      		out __SREG__,r0
+ 176 00aa 0F90      		pop r0
+ 177 00ac 1F90      		pop r1
+ 178 00ae 1895      		reti
+ 179               		.cfi_endproc
+ 180               	.LFE2:
+ 182               	.global	__vector_3
+ 184               	__vector_3:
+ 185               	.LFB3:
+  54:main.c        **** ISR(PCINT0_vect){
+ 186               		.loc 1 54 0
+ 187               		.cfi_startproc
+ 188 00b0 1F92      		push r1
+ 189               	.LCFI10:
+ 190               		.cfi_def_cfa_offset 3
+ 191               		.cfi_offset 1, -2
+ 192 00b2 0F92      		push r0
+ 193               	.LCFI11:
+ 194               		.cfi_def_cfa_offset 4
+ 195               		.cfi_offset 0, -3
+ 196 00b4 0FB6      		in r0,__SREG__
+ 197 00b6 0F92      		push r0
+ 198 00b8 1124      		clr __zero_reg__
+ 199 00ba 8F93      		push r24
+ 200               	.LCFI12:
+ 201               		.cfi_def_cfa_offset 5
+ 202               		.cfi_offset 24, -4
+ 203               	/* prologue: Signal */
+ 204               	/* frame size = 0 */
+ 205               	/* stack size = 4 */
+ 206               	.L__stack_usage = 4
+  55:main.c        **** 	if((PINB & (1<<PB3))==0){
+ 207               		.loc 1 55 0
+ 208 00bc 1B99      		sbic 0x3,3
+ 209 00be 00C0      		rjmp .L10
+  56:main.c        **** 		TCNT1 = 0;
+ 210               		.loc 1 56 0
+ 211 00c0 1092 8500 		sts 132+1,__zero_reg__
+ 212 00c4 1092 8400 		sts 132,__zero_reg__
+  57:main.c        **** 		PCMSK0 = 0;//clear pin change interrupts
+ 213               		.loc 1 57 0
+ 214 00c8 1092 6B00 		sts 107,__zero_reg__
+  58:main.c        **** 	    TIMSK0 = (1<<TOIE0);//set timer overflow interrupts
+ 215               		.loc 1 58 0
+ 216 00cc 81E0      		ldi r24,lo8(1)
+ 217 00ce 8093 6E00 		sts 110,r24
+  59:main.c        **** 	    TCCR1B = (1<<CS01);//set clock divider (8) for timer
+ 218               		.loc 1 59 0
+ 219 00d2 82E0      		ldi r24,lo8(2)
+ 220 00d4 8093 8100 		sts 129,r24
+ 221               	.L10:
+ 222               	/* epilogue start */
+  60:main.c        **** 	}
+  61:main.c        **** 
+  62:main.c        **** }
+ 223               		.loc 1 62 0
+ 224 00d8 8F91      		pop r24
+ 225 00da 0F90      		pop r0
+ 226 00dc 0FBE      		out __SREG__,r0
+ 227 00de 0F90      		pop r0
+ 228 00e0 1F90      		pop r1
+ 229 00e2 1895      		reti
+ 230               		.cfi_endproc
+ 231               	.LFE3:
+ 233               	.global	main
+ 235               	main:
+ 236               	.LFB4:
+  63:main.c        **** 
+  64:main.c        **** int main(void){
+ 237               		.loc 1 64 0
+ 238               		.cfi_startproc
+ 239               	/* prologue: function */
+ 240               	/* frame size = 0 */
+ 241               	/* stack size = 0 */
+ 242               	.L__stack_usage = 0
+  65:main.c        ****     DDRB = ~(1<<PB1);//all outputs except PB1
+ 243               		.loc 1 65 0
+ 244 00e4 8DEF      		ldi r24,lo8(-3)
+ 245 00e6 84B9      		out 0x4,r24
+  66:main.c        ****     PORTB = (1<<PB1);//set pullup
+ 246               		.loc 1 66 0
+ 247 00e8 82E0      		ldi r24,lo8(2)
+ 248 00ea 85B9      		out 0x5,r24
+  67:main.c        ****     PCICR = (1<<PCIE0);//enable pin change interrupts
+ 249               		.loc 1 67 0
+ 250 00ec 91E0      		ldi r25,lo8(1)
+ 251 00ee 9093 6800 		sts 104,r25
+  68:main.c        ****     PCMSK0 = (1<<PCINT0);//set pin change interrupt on PB0
+ 252               		.loc 1 68 0
+ 253 00f2 9093 6B00 		sts 107,r25
+  69:main.c        ****  
+  70:main.c        ****     OCR0A = 125;//CTC value for 1 KHz
+ 254               		.loc 1 70 0
+ 255 00f6 9DE7      		ldi r25,lo8(125)
+ 256 00f8 97BD      		out 0x27,r25
+  71:main.c        ****     OCR0B = 62;//CTC value for 50% duty cycle
+ 257               		.loc 1 71 0
+ 258 00fa 9EE3      		ldi r25,lo8(62)
+ 259 00fc 98BD      		out 0x28,r25
+  72:main.c        ****     
+  73:main.c        ****     TCCR0A = (1<<WGM01);//clear timer on compare with OCR0A
+ 260               		.loc 1 73 0
+ 261 00fe 84BD      		out 0x24,r24
+  74:main.c        ****     TCCR0B = (1<<CS01)|(1<<CS00);///64 prescaler
+ 262               		.loc 1 74 0
+ 263 0100 83E0      		ldi r24,lo8(3)
+ 264 0102 85BD      		out 0x25,r24
+  75:main.c        ****     TIMSK0 =(1<<OCIE0A)|(1<<OCIE0B);//timer match b interrupt
+ 265               		.loc 1 75 0
+ 266 0104 86E0      		ldi r24,lo8(6)
+ 267 0106 8093 6E00 		sts 110,r24
+ 268               	.L13:
+  76:main.c        ****     
+  77:main.c        ****     
+  78:main.c        ****     
+  79:main.c        ****     while(1){
+  80:main.c        ****     	sei();
+ 269               		.loc 1 80 0 discriminator 1
+ 270               	/* #APP */
+ 271               	 ;  80 "main.c" 1
+ 272 010a 7894      		sei
+ 273               	 ;  0 "" 2
+  81:main.c        ****     	asm("sleep");
+ 274               		.loc 1 81 0 discriminator 1
+ 275               	 ;  81 "main.c" 1
+ 276 010c 8895      		sleep
+ 277               	 ;  0 "" 2
+ 278               	/* #NOAPP */
+ 279 010e 00C0      		rjmp .L13
+ 280               		.cfi_endproc
+ 281               	.LFE4:
+ 283               	.global	LOOKUP
+ 284               		.section	.rodata
+ 287               	LOOKUP:
+ 288 0000 00        		.byte	0
+ 289 0001 06        		.byte	6
+ 290 0002 0C        		.byte	12
+ 291 0003 13        		.byte	19
+ 292 0004 1A        		.byte	26
+ 293 0005 26        		.byte	38
+ 294 0006 32        		.byte	50
+ 295 0007 41        		.byte	65
+ 296 0008 57        		.byte	87
+ 297 0009 7D        		.byte	125
+ 298               	.global	totalcounter
+ 299               		.section .bss
+ 302               	totalcounter:
+ 303 0000 00        		.zero	1
+ 304               	.global	miss
+ 307               	miss:
+ 308 0001 00        		.zero	1
+ 309               	.global	hit
+ 312               	hit:
+ 313 0002 00        		.zero	1
+ 314               	.global	incrementer
+ 317               	incrementer:
+ 318 0003 00        		.zero	1
+ 319               	.global	lookupcounter
+ 320               		.data
+ 323               	lookupcounter:
+ 324 0000 04        		.byte	4
+ 325               		.text
+ 326               	.Letext0:
+ 327               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccVPCdUY.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccVPCdUY.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccVPCdUY.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccVPCdUY.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccVPCdUY.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccVPCdUY.s:12     .text:0000000000000000 __vector_15
+     /tmp/ccVPCdUY.s:56     .text:0000000000000020 __vector_14
+     /tmp/ccVPCdUY.s:98     .text:000000000000003e __vector_13
+     /tmp/ccVPCdUY.s:302    .bss:0000000000000000 totalcounter
+     /tmp/ccVPCdUY.s:312    .bss:0000000000000002 hit
+     /tmp/ccVPCdUY.s:307    .bss:0000000000000001 miss
+     /tmp/ccVPCdUY.s:184    .text:00000000000000b0 __vector_3
+     /tmp/ccVPCdUY.s:235    .text:00000000000000e4 main
+     /tmp/ccVPCdUY.s:287    .rodata:0000000000000000 LOOKUP
+     /tmp/ccVPCdUY.s:317    .bss:0000000000000003 incrementer
+     /tmp/ccVPCdUY.s:323    .data:0000000000000000 lookupcounter
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
