@@ -9,11 +9,11 @@ There is one key difference in this lab. Instead of MSP43x microcontrollers, thi
 This lab will use the following micros:
 * ATMega328P
 * ATTiny85
-* ATTiny4313
+* ATTiny13A
 
 And Possibly
 * ATMega328PB
-* ATTiny13A
+* ATTiny4313
 * ATTiny88
 * ATTiny24
 * ATTiny10
@@ -30,7 +30,6 @@ AVR has several advantages. These include:
 * More tolerant BOD
 * 2-cycle 16-bit arithmetic and more advanced hardware multiplier
 * Almost all uC's have DIP variants making prototyping easier
-* More advanced UART transceiver
 * Significantly more ESD-resistant
 * Wafer level packaging for you crazy solder kids (1.5x1.4mm package with .4mm pin pitch)
 
